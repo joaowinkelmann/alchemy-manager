@@ -380,7 +380,7 @@ class AlchemyChart:
                 "reason": "No valid path found with the given ingredients",
                 "path": path
             }
-    
+        
     def _recursive_validate(self, table, patterns, pattern_idx, current_pos, target_pos, path):
         # Base case: no more patterns to try
         if pattern_idx >= len(patterns):
@@ -412,7 +412,29 @@ class AlchemyChart:
                 "path": path
             }
         
-        # Apply pattern to board
+        # Calculate where the end point will land on the board
+        end_pos_i = current_pos[0] + (end_i - start_i)
+        end_pos_j = current_pos[1] + (end_j - start_j)
+        
+        # Check if pattern endpoint is out of bounds
+        if (end_pos_i < 0 or end_pos_i >= self.game_data.TAB or 
+            end_pos_j < 0 or end_pos_j >= self.game_data.TAB):
+            return {
+                "valid": False,
+                "reason": f"Pattern {pattern_idx+1} endpoint goes out of bounds",
+                "path": path
+            }
+        
+        # Check if reached target with this pattern
+        if [end_pos_i, end_pos_j] == list(target_pos):
+            path.append(f"({end_pos_i},{end_pos_j})")
+            return {
+                "valid": True,
+                "reason": "Path is valid",
+                "path": " → ".join(path)
+            }
+        
+        # Apply pattern to board and check for obstacles
         for i in range(len(pattern)):
             for j in range(len(pattern[i])):
                 # Skip empty cells
@@ -440,21 +462,17 @@ class AlchemyChart:
                         "path": path
                     }
                 
-                # Check if we've reached the target with the endpoint
-                if pattern[i][j] == 3 and table[board_i][board_j] == 4:
-                    if [board_i, board_j] == target_pos:
-                        path.append(f"({board_i},{board_j})")
-                        return {
-                            "valid": True,
-                            "reason": "Path is valid",
-                            "path": " → ".join(path)
-                        }
+                # Updated check: Only validate if the pattern's ENDPOINT (value 3) is at the target position
+                if table[board_i][board_j] == 4 and [board_i, board_j] == list(target_pos) and pattern[i][j] == 3:
+                    path.append(f"({board_i},{board_j})")
+                    return {
+                        "valid": True,
+                        "reason": "Path is valid (endpoint reaches target)",
+                        "path": " → ".join(path)
+                    }
         
         # Calculate next position
-        next_pos = [
-            current_pos[0] + (end_i - start_i),
-            current_pos[1] + (end_j - start_j)
-        ]
+        next_pos = [end_pos_i, end_pos_j]
         
         # Add to path
         path.append(f"({next_pos[0]},{next_pos[1]})")

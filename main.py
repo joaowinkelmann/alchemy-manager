@@ -6,6 +6,7 @@ from AlchemyChart import AlchemyChart
 from IngredientsManager import IngredientsManager
 from InventoryManager import InventoryManager
 from RecipesManager import RecipesManager
+from PotionFinder import PotionFinder
 from data.GameData import GameData
 
 class AlchemyApplication:
@@ -26,6 +27,7 @@ class AlchemyApplication:
         self.create_ingredients_editor_tab()
         self.create_inventory_manager_tab()
         self.create_recipes_manager_tab()
+        self.create_potion_finder_tab()
     
     def create_alchemy_chart_tab(self):
         chart_frame = ttk.Frame(self.notebook)
@@ -54,6 +56,13 @@ class AlchemyApplication:
         
         # Initialize the recipes manager
         self.recipes_manager = RecipesManager(recipes_frame, self.game_data)
+
+    def create_potion_finder_tab(self):
+        finder_frame = ttk.Frame(self.notebook)
+        self.notebook.add(finder_frame, text="Potion Finder")
+        
+        # Initialize the potion finder
+        self.potion_finder = PotionFinder(finder_frame, self.game_data)
 
 def main():
     root = tk.Tk()
