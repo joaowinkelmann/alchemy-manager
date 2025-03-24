@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-class RecipesManager:
+class RecipeManager:
     def __init__(self, parent, game_data):
         self.parent = parent
         self.game_data = game_data

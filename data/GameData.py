@@ -1,8 +1,8 @@
 class GameData:
     def __init__(self):
         # Constants
-        self.TAB = 13
-        self.CENTER = self.TAB // 2
+        self.TAB = 13 # size of the game board
+        self.CENTER = self.TAB // 2 # center of the game board
         
         # Initialize game data
         self.init_blocked_cells()
@@ -26,47 +26,55 @@ class GameData:
         ]
     
     def init_potions(self):
-        # Define potions (based on C code)
+        # Define potions
         self.potions = {
             "Dispel": {
                 "position": (7, 10),
                 "effect": "Removes magical effects",
-                "rarity": "Common"
+                "rarity": "Common",
+                "color": "purple" # color to be used in the GUI
             },
             "Healing": {
                 "position": (3, 9),
                 "effect": "Restores health",
-                "rarity": "Common"
+                "rarity": "Common",
+                "color": "red"
             },
             "Regen": {
                 "position": (0, 6),
                 "effect": "Regenerates health over time",
-                "rarity": "Uncommon"
+                "rarity": "Uncommon",
+                "color": "pink"
             },
             "Defense": {
                 "position": (2, 1),
                 "effect": "Increases physical defense",
-                "rarity": "Uncommon"
+                "rarity": "Uncommon",
+                "color": "gray"
             },
             "Strength": {
                 "position": (6, 2),
                 "effect": "Increases physical attack power",
-                "rarity": "Uncommon"
+                "rarity": "Uncommon",
+                "color": "orange"
             },
             "Haste": {
                 "position": (10, 2),
                 "effect": "Increases speed",
-                "rarity": "Rare"
+                "rarity": "Rare",
+                "color": "lightblue"
             },
             "Poison": {
                 "position": (10, 7),
                 "effect": "Causes damage over time",
-                "rarity": "Rare"
+                "rarity": "Rare",
+                "color": "green"
             },
             "Acid": {
                 "position": (12, 9),
                 "effect": "Causes severe damage",
-                "rarity": "Very Rare"
+                "rarity": "Very Rare",
+                "color": "lime"
             }
         }
     

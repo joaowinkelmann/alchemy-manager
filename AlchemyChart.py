@@ -72,9 +72,14 @@ class AlchemyChart:
                     color = "black"
                     text = ""
                 elif table[i][j] == 4:
-                    # Potion
-                    color = "lightblue"
-                    text = self.get_potion_at_position(i, j)[0]  # First letter
+                    # Potion - use color from GameData
+                    potion_name = self.get_potion_at_position(i, j)
+                    color = "lightblue"  # Default if color not found
+                    text = potion_name[0] if potion_name else ""  # First letter
+                    
+                    # Get color from GameData if available
+                    if potion_name in self.game_data.potions:
+                        color = self.game_data.potions[potion_name].get("color", "lightblue")
                 else:
                     # Empty
                     color = "white"
@@ -92,34 +97,22 @@ class AlchemyChart:
                         font=("Arial", 12, "bold")
                     )
         
-        # Add potion legend
-        y_offset = 10
-        self.chart_canvas.create_text(
-            canvas_width - 100, 
-            y_offset, 
-            text="Potions:", 
-            font=("Arial", 10, "bold"),
-            anchor="nw"
-        )
-        
-        y_offset += 20
-        for name, potion in self.game_data.potions.items():
-            self.chart_canvas.create_rectangle(
-                canvas_width - 100, 
-                y_offset, 
-                canvas_width - 80, 
-                y_offset + 15, 
-                fill="lightblue"
-            )
-            self.chart_canvas.create_text(
-                canvas_width - 75, 
-                y_offset + 7, 
-                text=name, 
-                anchor="w",
-                font=("Arial", 8)
-            )
-            y_offset += 20
-    
+        # Optional: Add small position indicators
+        for i in range(self.game_data.TAB):
+            for j in range(self.game_data.TAB):
+                x1 = j * cell_size
+                y1 = i * cell_size
+                
+                # Add tiny coordinate labels in corner (optional)
+                self.chart_canvas.create_text(
+                    x1 + 5,
+                    y1 + 5,
+                    text=f"{i},{j}",
+                    font=("Arial", 6),
+                    fill="gray",
+                    anchor="nw"
+                )
+
     def get_potion_at_position(self, i, j):
         for name, potion in self.game_data.potions.items():
             position = potion["position"]
@@ -131,13 +124,13 @@ class AlchemyChart:
         # Target potion
         ttk.Label(parent, text="Target Potion:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.potion_var = tk.StringVar(value=list(self.game_data.potions.keys())[0])
-        potion_combo = ttk.Combobox(
+        self.potion_combobox = ttk.Combobox(
             parent, 
             textvariable=self.potion_var,
             values=list(self.game_data.potions.keys()),
             state="readonly"
         )
-        potion_combo.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.potion_combobox.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         
         # Max moves
         ttk.Label(parent, text="Max Moves:").grid(row=1, column=0, padx=5, pady=5, sticky="w")
@@ -176,14 +169,14 @@ class AlchemyChart:
         # Recipe selection
         ttk.Label(parent, text="Recipe:").grid(row=4, column=0, padx=5, pady=5, sticky="w")
         self.recipe_var = tk.StringVar()
-        recipe_combo = ttk.Combobox(
+        self.recipe_combobox = ttk.Combobox(
             parent,
             textvariable=self.recipe_var,
             values=[recipe["name"] for recipe in self.game_data.recipes],
             state="readonly"
         )
-        recipe_combo.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
-        recipe_combo.bind("<<ComboboxSelected>>", self.load_recipe)
+        self.recipe_combobox.grid(row=4, column=1, padx=5, pady=5, sticky="ew")
+        self.recipe_combobox.bind("<<ComboboxSelected>>", self.load_recipe)
         
         # Verify button
         verify_button = ttk.Button(parent, text="Verify Path", command=self.verify_path)
@@ -479,3 +472,18 @@ class AlchemyChart:
         
         # Continue with next pattern
         return self._recursive_validate(table, patterns, pattern_idx + 1, next_pos, target_pos, path)
+    
+    def refresh(self):
+        """Refresh the chart with the latest data"""
+        # Just update the chart drawing
+        self.draw_chart()
+        
+        # Instead of trying to find widgets by internal variable names,
+        # simply update the dropdown lists if they exist as instance attributes
+        if hasattr(self, 'recipe_combobox'):
+            recipe_values = [recipe["name"] for recipe in self.game_data.recipes]
+            self.recipe_combobox['values'] = recipe_values
+        
+        if hasattr(self, 'potion_combobox'):
+            potion_values = list(self.game_data.potions.keys())
+            self.potion_combobox['values'] = potion_values

@@ -4,7 +4,7 @@ import itertools
 import threading
 import time
 
-class PotionFinder:
+class RecipeFinder:
     def __init__(self, parent, game_data):
         self.parent = parent
         self.game_data = game_data
@@ -559,3 +559,24 @@ class AlchemyChartHelper:
         
         # Continue with next pattern
         return self._recursive_validate(table, patterns, pattern_idx + 1, next_pos, target_pos, path)
+    
+    def refresh(self):
+        """Refresh the finder with the latest data"""
+        # Update potion dropdown
+        potion_values = list(self.game_data.potions.keys())
+        if len(potion_values) > 0:
+            #debug print all the potions
+            for potion in potion_values:
+               print(potion)
+            if self.potion_var.get() not in potion_values:
+                self.potion_var.set(potion_values[0])
+        else:
+            self.potion_var.set("")
+        
+        potion_combobox = self.parent.nametowidget(self.potion_var._name)
+        potion_combobox['values'] = potion_values
+        
+        # Update ingredient list
+        self.ingredient_listbox.delete(0, tk.END)
+        for ingredient in sorted(self.game_data.ingredients.keys()):
+            self.ingredient_listbox.insert(tk.END, ingredient)

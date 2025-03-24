@@ -5,8 +5,9 @@ from tkinter import ttk
 from AlchemyChart import AlchemyChart
 from IngredientsManager import IngredientsManager
 from InventoryManager import InventoryManager
-from RecipesManager import RecipesManager
-from PotionFinder import PotionFinder
+from RecipeManager import RecipeManager
+from RecipeFinder import RecipeFinder
+from PotionManager import PotionManager
 from data.GameData import GameData
 
 class AlchemyApplication:
@@ -27,7 +28,34 @@ class AlchemyApplication:
         self.create_ingredients_editor_tab()
         self.create_inventory_manager_tab()
         self.create_recipes_manager_tab()
-        self.create_potion_finder_tab()
+        self.create_recipe_finder_tab()
+        self.create_potion_manager_tab()
+
+        # Bind tab change event
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
+
+    def on_tab_changed(self, event):
+        """Handle tab change events by refreshing the selected tab"""
+        current_tab = self.notebook.index("current")
+        
+        # Refresh the appropriate component based on the selected tab
+        if current_tab == 0:  # Alchemy Chart
+            self.alchemy_chart.refresh()
+        elif current_tab == 1:  # Ingredients Editor
+            if hasattr(self.ingredients_manager, 'refresh'):
+                self.ingredients_manager.refresh()
+        elif current_tab == 2:  # Inventory Manager
+            if hasattr(self.inventory_manager, 'refresh'):
+                self.inventory_manager.refresh()
+        elif current_tab == 3:  # Recipes Manager
+            if hasattr(self.recipe_manager, 'refresh'):
+                self.recipe_manager.refresh()
+        elif current_tab == 4:  # Recipe Finder
+            if hasattr(self.recipe_finder, 'refresh'):
+                self.recipe_finder.refresh()
+        elif current_tab == 5:  # Potion Manager
+            if hasattr(self.potion_manager, 'refresh'):
+                self.potion_manager.refresh()
     
     def create_alchemy_chart_tab(self):
         chart_frame = ttk.Frame(self.notebook)
@@ -54,15 +82,22 @@ class AlchemyApplication:
         recipes_frame = ttk.Frame(self.notebook)
         self.notebook.add(recipes_frame, text="Recipes Manager")
         
-        # Initialize the recipes manager
-        self.recipes_manager = RecipesManager(recipes_frame, self.game_data)
+        # Initialize the recipe manager
+        self.recipe_manager = RecipeManager(recipes_frame, self.game_data)
 
-    def create_potion_finder_tab(self):
+    def create_recipe_finder_tab(self):
         finder_frame = ttk.Frame(self.notebook)
         self.notebook.add(finder_frame, text="Potion Finder")
         
-        # Initialize the potion finder
-        self.potion_finder = PotionFinder(finder_frame, self.game_data)
+        # Initialize the recipe finder
+        self.recipe_finder = RecipeFinder(finder_frame, self.game_data)
+    
+    def create_potion_manager_tab(self):
+        potion_frame = ttk.Frame(self.notebook)
+        self.notebook.add(potion_frame, text="Potion Manager")
+        
+        # Initialize the potion manager
+        self.potion_manager = PotionManager(potion_frame, self.game_data)
 
 def main():
     root = tk.Tk()
