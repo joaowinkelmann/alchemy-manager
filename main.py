@@ -46,16 +46,16 @@ class AlchemyApplication:
                 self.ingredients_manager.refresh()
         elif current_tab == 2:  # Inventory Manager
             if hasattr(self.inventory_manager, 'refresh'):
-                self.inventory_manager.refresh()
+                self.inventory_manager.refresh()  # Added actual refresh call
         elif current_tab == 3:  # Recipes Manager
             if hasattr(self.recipe_manager, 'refresh'):
-                self.recipe_manager.refresh()
+                self.recipe_manager.refresh()  # Added actual refresh call
         elif current_tab == 4:  # Recipe Finder
             if hasattr(self.recipe_finder, 'refresh'):
-                self.recipe_finder.refresh()
+                self.recipe_finder.refresh()  # Added actual refresh call
         elif current_tab == 5:  # Potion Manager
             if hasattr(self.potion_manager, 'refresh'):
-                self.potion_manager.refresh()
+                self.potion_manager.refresh()  # Added actual refresh call
     
     def create_alchemy_chart_tab(self):
         chart_frame = ttk.Frame(self.notebook)

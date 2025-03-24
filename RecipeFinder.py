@@ -40,14 +40,15 @@ class RecipeFinder:
         # Target potion selection
         ttk.Label(controls_grid, text="Target Potion:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.potion_var = tk.StringVar(value=list(self.game_data.potions.keys())[0])
-        potion_combo = ttk.Combobox(
+        # Store a reference to the combobox
+        self.potion_combobox = ttk.Combobox(
             controls_grid, 
             textvariable=self.potion_var,
             values=list(self.game_data.potions.keys()),
             state="readonly",
             width=15
         )
-        potion_combo.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        self.potion_combobox.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         
         # Max moves
         ttk.Label(controls_grid, text="Maximum Moves:").grid(row=0, column=2, padx=5, pady=5, sticky="w")
@@ -353,7 +354,7 @@ class RecipeFinder:
         
         # Switch to the tab with results
         for i in range(1, 6):
-            if valid_combinations[i]:
+            if valid_combinations.get(i):  # Use .get() to avoid KeyError
                 self.results_notebook.select(i-1)
                 break
     
@@ -423,6 +424,29 @@ class RecipeFinder:
             text_widget.delete("1.0", tk.END)
             text_widget.config(state="disabled")
 
+    def refresh(self):
+        """Refresh the finder with the latest data"""
+        print("refreshing recipe finder")
+        # Update potion dropdown using the stored reference
+        potion_values = list(self.game_data.potions.keys())
+        
+        if len(potion_values) > 0:
+            # Debug: print all potions
+            for potion in potion_values:
+                print(potion)
+            if self.potion_var.get() not in potion_values:
+                self.potion_var.set(potion_values[0])
+        else:
+            self.potion_var.set("")
+        
+        # Update combobox directly using the stored reference
+        if hasattr(self, 'potion_combobox'):
+            self.potion_combobox['values'] = potion_values
+        
+        # Update ingredient list
+        self.ingredient_listbox.delete(0, tk.END)
+        for ingredient in sorted(self.game_data.ingredients.keys()):
+            self.ingredient_listbox.insert(tk.END, ingredient)
 
 # Helper class to use AlchemyChart's validation without UI elements
 class AlchemyChartHelper:
@@ -559,24 +583,3 @@ class AlchemyChartHelper:
         
         # Continue with next pattern
         return self._recursive_validate(table, patterns, pattern_idx + 1, next_pos, target_pos, path)
-    
-    def refresh(self):
-        """Refresh the finder with the latest data"""
-        # Update potion dropdown
-        potion_values = list(self.game_data.potions.keys())
-        if len(potion_values) > 0:
-            #debug print all the potions
-            for potion in potion_values:
-               print(potion)
-            if self.potion_var.get() not in potion_values:
-                self.potion_var.set(potion_values[0])
-        else:
-            self.potion_var.set("")
-        
-        potion_combobox = self.parent.nametowidget(self.potion_var._name)
-        potion_combobox['values'] = potion_values
-        
-        # Update ingredient list
-        self.ingredient_listbox.delete(0, tk.END)
-        for ingredient in sorted(self.game_data.ingredients.keys()):
-            self.ingredient_listbox.insert(tk.END, ingredient)
